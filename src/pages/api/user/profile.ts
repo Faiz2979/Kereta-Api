@@ -23,7 +23,6 @@ export default async function profileHandler(req: NextApiRequest, res: NextApiRe
     const decoded: any = jwt.verify(token, secretKey);
     const user = await prisma.users.findUnique({
       where: { id: decoded.userId },
-      include: { pelanggan: true },
     });
 
     if (!user) {
@@ -31,44 +30,51 @@ export default async function profileHandler(req: NextApiRequest, res: NextApiRe
     }
 
     // Check if the user is an admin
-    if (user.role === 'petugas') {
-      const { userId, username } = req.query;
-
-      if (userId) {
-        const targetUser = await prisma.users.findUnique({
-          where: { id: Number(userId) },
-          include: { pelanggan: true },
-        });
-
-        if (!targetUser) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-
-        return res.status(200).json(targetUser);
-      }
-
-      if (username) {
-        const targetUser = await prisma.users.findFirst({
-          where: { username: String(username) },
-          include: { pelanggan: true },
-        });
-
-        if (!targetUser) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-
-        return res.status(200).json(targetUser);
-      }
-
-      // If no specific user is requested, return all users
-      const allUsers = await prisma.users.findMany({
-        include: { pelanggan: true },
-      });
-
-      return res.status(200).json(allUsers);
+    if (user.role !== 'petugas') {
+      return res.status(403).json({ message: 'Forbidden' });
     }
 
-    return res.status(200).json(user);
+    const { userId, username } = req.query;
+
+    let targetUser;
+
+    if (userId) {
+      targetUser = await prisma.users.findUnique({
+        where: { id: Number(userId) },
+        select: {
+          id: true,
+          username: true,
+          nama: true,
+          telp: true,
+        },
+      });
+    } else if (username) {
+      targetUser = await prisma.users.findFirst({
+        where: { username: String(username) },
+        select: {
+          id: true,
+          username: true,
+          nama: true,
+          telp: true,
+        },
+      });
+    } else {
+      // Fetch all users if no userId or username is provided
+      targetUser = await prisma.users.findMany({
+        select: {
+          id: true,
+          username: true,
+          nama: true,
+          telp: true,
+        },
+      });
+    }
+
+    if (!targetUser || (Array.isArray(targetUser) && targetUser.length === 0)) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json(targetUser);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
