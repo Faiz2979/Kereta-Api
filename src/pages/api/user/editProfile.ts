@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 const secretKey = process.env.JWT_SECRET || 'your_secret_key';
 
 export default async function editProfileHandler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'PUT') {
+  if (req.method !== 'PATCH') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
