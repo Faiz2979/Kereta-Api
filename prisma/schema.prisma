@@ -99,6 +99,7 @@ model PembelianTiket {
   pelanggan       Pelanggan         @relation(fields: [pelangganId], references: [id])
   jadwal          Jadwal            @relation(fields: [jadwalId], references: [id])
   detailPembelian DetailPembelian[]
+  harga           Float?            // Ensure this field is optional
 }
 
 model Penumpang {
