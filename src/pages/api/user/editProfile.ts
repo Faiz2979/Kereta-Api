@@ -29,16 +29,23 @@ export default async function editProfileHandler(req: NextApiRequest, res: NextA
       return res.status(401).json({ message: 'Invalid token' });
     }
 
-    const { nama, alamat, telp } = req.body;
+    const { username, nama, alamat, telp, userId } = req.body;
 
-    if (!nama && !alamat && !telp) {
+    if (!username && !nama && !alamat && !telp) {
       return res.status(400).json({ message: 'No data provided to update' });
     }
 
+    if (userId && decoded.role !== 'petugas') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const targetUserId = userId || decoded.userId;
+
     const updatedUser = await prisma.users.update({
-      where: { id: decoded.userId },
+      where: { id: targetUserId },
       data: {
-        nama: nama || undefined,
+        username: username || undefined,
+        nama: decoded.role === 'petugas' ? nama || undefined : undefined,
         alamat: alamat || undefined,
         telp: telp || undefined,
         pelanggan: decoded.role === 'pelanggan' ? {
