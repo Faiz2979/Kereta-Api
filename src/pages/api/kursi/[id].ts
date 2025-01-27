@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             });
 
             if (!gerbong) {
-                return res.status(404).json({ message: "Kereta not found" });
+                return res.status(404).json({ message: "Kursi not found" });
             }
 
             return res.status(200).json({ gerbong });
