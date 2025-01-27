@@ -47,10 +47,9 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
 
     const totalPenumpang = penumpang.length;
 
-    // Remove kuota check
-    // if (totalPenumpang > jadwal.kuota) {
-    //   return res.status(400).json({ message: 'Kuota tidak mencukupi' });
-    // }
+    if (totalPenumpang > jadwal.kuota) {
+      return res.status(400).json({ message: 'Kuota tidak mencukupi' });
+    }
 
     const pelanggan = await prisma.pelanggan.findFirst({
       where: { userId: user.id },
@@ -74,11 +73,12 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
       },
     });
 
-    // Remove kuota update
-    // await prisma.jadwal.update({
-    //   where: { id: jadwal.id },
-    //   data: { kuota: jadwal.kuota - totalPenumpang },
-    // });
+    const updatedJadwal = await prisma.jadwal.update({
+      where: { id: jadwal.id },
+      data: { kuota: jadwal.kuota - totalPenumpang },
+    });
+
+    const remainingTickets = updatedJadwal.kuota;
 
     // Generate PDF
     const doc = new PDFDocument();
@@ -109,6 +109,9 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
     penumpang.forEach((p: any, index: number) => {
       doc.text(`${index + 1}. Nama: ${p.nama}, NIK: ${p.nik}`);
     });
+
+    doc.moveDown();
+    doc.text(`Sisa tiket yang tersedia: ${remainingTickets}`);
 
     doc.end();
   } catch (error) {
