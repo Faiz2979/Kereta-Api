@@ -26,13 +26,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: {
           username,
           password: hashedPassword,
-          email: email,
+          email,
           role,
           nama,
           alamat,
           telp,
-          nik
-        }
+          nik,
+          ...(role === "pelanggan" && {
+            pelanggan: {
+              create: {
+                nik,
+                nama,
+                alamat,
+                telp,
+              },
+            },
+          }),
+          ...(role === "petugas" && {
+            petugas: {
+              create: {
+                nama,
+                alamat,
+                telp,
+              },
+            },
+          }),
+        },
       });
 
       return res.status(201).json(user);
