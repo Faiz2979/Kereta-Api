@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { format } from 'date-fns';
 
 const prisma = new PrismaClient();
 const secretKey = process.env.JWT_SECRET || 'your_secret_key';
@@ -48,7 +49,28 @@ export default async function historyHandler(req: NextApiRequest, res: NextApiRe
       },
     });
 
-    return res.status(200).json(history);
+    // Format and simplify the response
+    const formattedHistory = history.map((transaksi) => ({
+      id: transaksi.id,
+      tanggal: format(new Date(transaksi.tanggal), 'yyyy-MM-dd'),
+      jadwal: {
+        kereta: transaksi.jadwal.kereta.namaKereta,
+        waktuBerangkat: transaksi.jadwal.waktuBerangkat,
+        waktuTiba: transaksi.jadwal.waktuTiba,
+        stasiunBerangkat: transaksi.jadwal.stasiunBerangkat,
+        stasiunTiba: transaksi.jadwal.stasiunTiba,
+        asalKeberangkatan: transaksi.jadwal.asalKeberangkatan,
+        tujuanKeberangkatan: transaksi.jadwal.tujuanKeberangkatan,
+        tanggalBerangkat: format(new Date(transaksi.jadwal.tanggalBerangkat), 'yyyy-MM-dd'),
+        tanggalKedatangan: format(new Date(transaksi.jadwal.tanggalKedatangan), 'yyyy-MM-dd'),
+      },
+      penumpang: transaksi.penumpang.map((penumpang) => ({
+        nama: penumpang.nama,
+        nik: penumpang.nik,
+      })),
+    }));
+
+    return res.status(200).json(formattedHistory);
   } catch (error) {
     console.error('Error fetching ticket history:', error);
     return res.status(500).json({ message: 'Internal server error' });

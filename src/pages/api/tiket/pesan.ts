@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
-import { Readable } from 'stream';
+import { Readable, PassThrough } from 'stream';
+import { format } from 'date-fns';
 
 const prisma = new PrismaClient();
 const secretKey = process.env.JWT_SECRET || 'your_secret_key';
@@ -73,33 +74,30 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
       },
     });
 
-    const updatedJadwal = await prisma.jadwal.update({
+    await prisma.jadwal.update({
       where: { id: jadwal.id },
       data: { kuota: jadwal.kuota - totalPenumpang },
     });
 
-    const remainingTickets = updatedJadwal.kuota;
-
     // Generate PDF
     const doc = new PDFDocument();
-    let buffers: Buffer[] = [];
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => {
-      const pdfData = Buffer.concat(buffers);
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=bukti_pemesanan.pdf');
-      res.send(pdfData);
-    });
+    const stream = new PassThrough();
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=bukti_pemesanan.pdf');
+
+    doc.pipe(stream);
+    stream.pipe(res);
 
     doc.fontSize(20).text('Bukti Pemesanan Tiket', { align: 'center' });
     doc.moveDown();
     doc.fontSize(14).text(`Nama Pelanggan: ${pelanggan.nama}`);
     doc.text(`NIK: ${pelanggan.nik}`);
-    doc.text(`Tanggal Pemesanan: ${new Date().toLocaleDateString()}`);
+    doc.text(`Tanggal Pemesanan: ${format(new Date(), 'yyyy-MM-dd')}`);
     doc.text(`Kereta: ${jadwal.kereta.namaKereta}`);
     doc.text(`Asal: ${jadwal.asalKeberangkatan}`);
     doc.text(`Tujuan: ${jadwal.tujuanKeberangkatan}`);
-    doc.text(`Tanggal Berangkat: ${new Date(jadwal.tanggalBerangkat).toLocaleDateString()}`);
+    doc.text(`Tanggal Berangkat: ${format(new Date(jadwal.tanggalBerangkat), 'yyyy-MM-dd')}`);
     doc.text(`Waktu Berangkat: ${jadwal.waktuBerangkat}`);
     doc.text(`Waktu Tiba: ${jadwal.waktuTiba}`);
     doc.text(`Harga: Rp ${jadwal.harga}`);
@@ -109,9 +107,6 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
     penumpang.forEach((p: any, index: number) => {
       doc.text(`${index + 1}. Nama: ${p.nama}, NIK: ${p.nik}`);
     });
-
-    doc.moveDown();
-    doc.text(`Sisa tiket yang tersedia: ${remainingTickets}`);
 
     doc.end();
   } catch (error) {
