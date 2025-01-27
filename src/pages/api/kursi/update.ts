@@ -1,6 +1,6 @@
 // update data gerbong
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from "next";
 const prisma = new PrismaClient();
 
