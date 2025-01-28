@@ -37,7 +37,14 @@ export default async function transaksiHandler(req: NextApiRequest, res: NextApi
 
     let whereClause: any = {};
 
-    if (tanggal && bulan && tahun) {
+    if (!tanggal && !bulan && tahun) {
+      whereClause = {
+        tanggal: {
+          gte: new Date(`${tahun}-01-01T00:00:00Z`),
+          lt: new Date(`${Number(tahun) + 1}-01-01T00:00:00Z`),
+        },
+      };
+    } else if (tanggal && bulan && tahun) {
       whereClause = {
         tanggal: {
           gte: new Date(`${tahun}-${bulan}-${tanggal}T00:00:00Z`),
@@ -63,7 +70,11 @@ export default async function transaksiHandler(req: NextApiRequest, res: NextApi
     const transaksi = await prisma.pembelianTiket.findMany({
       where: whereClause,
       include: {
-        pelanggan: true,
+        pelanggan: {
+          include: {
+            user: true, // Include user relation to access email
+          },
+        },
         jadwal: {
           include: {
             kereta: true,
@@ -79,7 +90,7 @@ export default async function transaksiHandler(req: NextApiRequest, res: NextApi
       tanggal: format(new Date(transaksi.tanggal), 'yyyy-MM-dd'),
       pelanggan: {
         nama: transaksi.pelanggan.nama,
-        email: transaksi.pelanggan.email,
+        email: transaksi.pelanggan.user.email, // Access email from user relation
       },
       jadwal: {
         kereta: transaksi.jadwal.kereta.nama,
