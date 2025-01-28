@@ -543,7 +543,7 @@ Response Body
     }
 ```
 
-### Delete Kursi
+### Delete Jadwal
 
 Endpoint: api/jadwal/delete?id={id}
 
