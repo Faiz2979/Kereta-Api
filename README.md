@@ -1,13 +1,13 @@
-# Endpoint Documentation
+# **Endpoint** Documentation
 
 ## User
 ### User Register
 
-Endpoint: api/user/register
+**Endpoint**: ``api/user/register``
 
-Method: POST
+**Method**: ``POST``
 
-Request Body
+**Request Body**
 ```json
 {
   "username": "username",
@@ -21,7 +21,7 @@ Request Body
 ```
 if email contain petugas.com, the role will be petugas
 
-Response Body
+**Response Body**
 ```json
 {
     "id": 1,
@@ -38,11 +38,11 @@ Response Body
 
 ### Login User
 
-Endpoint: api/user/login
+**Endpoint**: ``api/user/login
 
-Method: **POST**
+**Method**: **``POST``**
 
-Request Body:
+**Request Body**
 ```json
 {
     "email":"aa@email.com",
@@ -50,7 +50,7 @@ Request Body:
 }
 ```
 
-Response Body:
+**Response Body**
 ```json
 {
     "token": "token",
@@ -58,17 +58,121 @@ Response Body:
 }
 ```
 
+### Edit Profile
+
+**Endpoint**: `api/user/editProfile`
+
+**Method**: `PATCH`
+
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
+
+**Request Body**
+```json
+{
+  "username": "new_username",
+  "nama": "new_name",
+  "alamat": "new_address",
+  "telp": "new_phone",
+  "userId": 2
+}
+```
+
+- The `userId` is optional and can only be used by users with the role `petugas`. If not provided, the user's own profile will be updated.
+- At least one of the fields (`username`, `nama`, `alamat`, `telp`) must be included.
+
+**Response Body**
+```json
+{
+  "id": 1,
+  "username": "new_username",
+  "nama": "new_name",
+  "alamat": "new_address",
+  "telp": "new_phone",
+  "role": "pelanggan",
+  "email": "user@example.com"
+}
+```
+
+
+### Get User Profile
+
+**Endpoint**: `api/user/profile`
+
+**Method**: `GET`
+
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
+
+**Request Query Parameters**
+- `userId` (optional): The ID of the user to fetch.
+- `username` (optional): The username of the user to fetch.
+
+If no query parameters are provided, all users will be fetched.
+
+**Response Body**
+- For a single user (by `userId` or `username`):
+```json
+{
+  "id": 1,
+  "username": "sampleuser",
+  "nama": "Sample Name",
+  "telp": "1234567890"
+}
+```
+- For all users:
+```json
+[
+  {
+    "id": 1,
+    "username": "sampleuser",
+    "nama": "Sample Name",
+    "telp": "1234567890"
+  },
+  {
+    "id": 2,
+    "username": "anotheruser",
+    "nama": "Another Name",
+    "telp": "0987654321"
+  }
+]
+```
+
+### Get Profile by Username
+
+**Endpoint**: `api/user/profile?username=<username>`
+
+**Method**: `GET`
+
+**Request Query Parameters**
+- `username` (required): The username of the user to fetch.
+
+**Response Body**
+```json
+{
+  "id": 1,
+  "username": "sampleuser",
+  "nama": "Sample Name",
+  "telp": "1234567890"
+}
+```
+
+
 ## Kereta
 ### Create Kereta
 
-Endpoint: api/kereta/create
+**Endpoint**: ``api/kereta/create``
 
-Method: **POST**
+**Method**: **``POST``**
 
-Request Header:
-Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Request Body**
 ```json
 {
     "namaKereta":"Kereta",
@@ -77,7 +181,7 @@ Request Body
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "kereta": {
@@ -91,15 +195,14 @@ Response Body
 
 ### Get Kereta
 Get all
-Endpoint: api/kereta
+**Endpoint**: `api/kereta`
 
 Get by id
-Endpoint: api/kereta/{id}
+**Endpoint**: `api/kereta/{id}`
 
-Method: **GET**
+**Method**: ``GET``
 
-Get all Response Body
-
+**Get all Response Body**
 ```json
 {
     "kereta": [
@@ -114,7 +217,7 @@ Get all Response Body
 }
 ```
 
-Get by id Response Body
+**Get by id Response Body**
 ```json
 {
     "kereta": {
@@ -128,20 +231,26 @@ Get by id Response Body
 
 ### Update Kereta
 
-Endpoint: api/kereta/update?id={id}
+**Endpoint**: `api/kereta/update?`
 
-Method: **PUT**
+**Method**: `PUT`
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Request Body**
 ```json
 {
     "namaKereta":"Kereta1"
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "kereta": {
@@ -155,13 +264,19 @@ Response Body
 
 ### Delete Kereta
 
-Endpoint: api/kereta/delete?id={id}
+**Endpoint**: `api/kereta/delete?`
+**Method**: ``DELETE``
 
-Method: **DELETE**
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Header: Bearer Token, Role petugas
 
-Response Body
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+
+**Response Body**
 ```json
 {
     "message": "Data deleted successfully",
@@ -177,14 +292,16 @@ Response Body
 ## Gerbong
 ### Create Gerbong
 
-Endpoint: api/gerbong/create
+**Endpoint**: `api/gerbong/create`
 
-Method: **POST**
+**Method**: ``POST``
 
-Request Header:
-Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Request Body**
 ```json
 {
     "namaGerbong":"Gerbong 1",
@@ -193,7 +310,7 @@ Request Body
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "gerbong": {
@@ -207,15 +324,14 @@ Response Body
 
 ### Get Gerbong
 Get all
-Endpoint: api/gerbong
+**Endpoint**: `api/gerbong`
 
 Get by id
-Endpoint: api/gerbong/{id}
+**Endpoint**: `api/gerbong/{id}`
 
-Method: **GET**
+**Method**: ``GET``
 
-Get all Response Body
-
+Get all **Response Body**
 ```json
 {
     "gerbong": [
@@ -230,7 +346,7 @@ Get all Response Body
 }
 ```
 
-Get by id Response Body
+Get by id **Response Body**
 ```json
 {
     "gerbong": {
@@ -244,20 +360,26 @@ Get by id Response Body
 
 ### Update Gerbong
 
-Endpoint: api/gerbong/update?id={id}
+**Endpoint**: `api/gerbong/update?`
 
-Method: **PUT**
+**Method**: ``PUT``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Request Body**
 ```json
 {
     "namaGerbong":"Gerbong 2"
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "gerbong": {
@@ -271,13 +393,19 @@ Response Body
 
 ### Delete Gerbong
 
-Endpoint: api/gerbong/delete?id={id}
+**Endpoint**: `api/gerbong/delete?`
 
-Method: **DELETE**
+**Method**: ``DELETE``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Response Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Response Body**
 ```json
 {
     "message": "Data deleted successfully",
@@ -293,14 +421,15 @@ Response Body
 ## Kursi
 ### Create Kursi
 
-Endpoint: api/kursi/create
+**Endpoint**: ``api/kursi/create``
 
-Method: **POST**
+**Method**: ``POST``
 
-Request Header:
-Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+**Request Body**
 ```json
 {
     "nomorKursi":"1",
@@ -308,7 +437,7 @@ Request Body
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "id": 1,
@@ -319,15 +448,14 @@ Response Body
 
 ### Get Kursi
 Get all
-Endpoint: api/kursi
+**Endpoint**: `api/kursi`
 
 Get by id
-Endpoint: api/kursi/{id}
+**Endpoint**: `api/kursi/{id}`
 
-Method: **GET**
+**Method**: ``GET``
 
-Get all Response Body
-
+Get all **Response Body**
 ```json
 {
     "kursi": [
@@ -341,7 +469,7 @@ Get all Response Body
 }
 ```
 
-Get by id Response Body
+Get by id **Response Body**
 ```json
 {
     "kursi": {
@@ -354,20 +482,26 @@ Get by id Response Body
 
 ### Update Kursi
 
-Endpoint: api/kursi/update?id={id}
+**Endpoint**: `api/kursi/update?`
 
-Method: **PUT**
+**Method**: ``PUT``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Request Body**
 ```json
 {
     "nomorKursi":"2"
 }
 ```
 
-Response Body
+**Response Body**
 ```json
 {
     "id": 1,
@@ -378,13 +512,19 @@ Response Body
 
 ### Delete Kursi
 
-Endpoint: api/kursi/delete?id={id}
+**Endpoint**: `api/kursi/delete?`
 
-Method: **DELETE**
+**Method**: ``DELETE``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Response Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Response Body**
 ```json
 {
     "message": "Data deleted successfully",
@@ -399,9 +539,9 @@ Response Body
 ## Jadwal
 ### Create Jadwal
 
-Endpoint: api/jadwal/create
+**Endpoint**: ``api/jadwal/create``
 
-Method: **POST**
+**Method**: **``POST``**
 
 Request Header:
 Bearer Token, Role petugas
@@ -444,14 +584,14 @@ Response Body
 
 ### Get Jadwal
 Get all
-Endpoint: api/jadwal
+**Endpoint**: `api/jadwal`
 
 Get by id
-Endpoint: api/kursi/{id}
+**Endpoint**: `api/kursi/{id}`
 
-Method: **GET**
+**Method**: ``GET``
 
-Get all Response Body
+Get all **Response Body**
 
 ```json
 {
@@ -481,7 +621,7 @@ Get all Response Body
 }
 ```
 
-Get by id Response Body
+Get by id **Response Body**
 ```json
 {
     "id": 1,
@@ -507,13 +647,19 @@ Get by id Response Body
 
 ### Update Jadwal
 
-Endpoint: api/jadwal/update?id={id}
+**Endpoint**: `api/jadwal/update?`
 
-Method: **PUT**
+**Method**: ``PUT``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Request Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Request Body**
 ```json
 {
     "waktuBerangkat": "09:00",
@@ -521,7 +667,7 @@ Request Body
 }
 ```
 
-Response Body
+**Response Body**
 ```json
     "id": 1,
     "keretaId": 1,
@@ -545,13 +691,19 @@ Response Body
 
 ### Delete Jadwal
 
-Endpoint: api/jadwal/delete?id={id}
+**Endpoint**: ``api/jadwal/delete?``
 
-Method: **DELETE**
+**Method**: ``DELETE``
 
-Request Header: Bearer Token, Role petugas
+**Header**
+- **Authorization**: Bearer Token
+  - Role: petugas
 
-Response Body
+
+**Query Parameter**
+- `id`: id kereta (`number`)
+
+**Response Body**
 ```json
 {
 {
@@ -574,3 +726,151 @@ Response Body
 }
 ```
 
+
+
+## Tiket
+
+### Pesan
+**Endpoint**: `api/tiket/pesan`
+
+**Method**: ``POST``
+
+**Header**
+- **Authorization**: Bearer Token
+  - Role: pelanggan
+
+**Request Body**
+```json
+{
+  "jadwalId": 1,
+  "penumpang": [
+    {
+      "nama": "John Doe",
+      "nik": "1234567890123456"
+    },
+    {
+      "nama": "Jane Doe",
+      "nik": "6543210987654321"
+    }
+  ]
+}
+```
+
+**Response Body**
+![Alt text](./images/image.png)
+
+
+
+### Lihat Transaksi
+**Endpoint**: `/api/tiket/transaksi`
+
+**Method**: `GET`
+
+**Header**
+- **Authorization**: Bearer Token
+  - Role: pelanggan
+
+**Query Parameters** (opsional):  
+- `tanggal`: hari spesifik (format: `DD`)  
+- `bulan`: bulan tertentu (format: `MM`)  
+- `tahun`: tahun tertentu (format: `YYYY`)  
+
+**Contoh Query**:
+- `/api/tiket/transaksi?tanggal=15&bulan=01&tahun=2025`
+- `/api/tiket/transaksi?tahun=2025`
+
+**Response Body**:
+```json
+[
+  {
+    "id": 1,
+    "tanggal": "2025-01-15",
+    "pelanggan": {
+      "nama": "John Doe",
+      "nik": "1234567890123456"
+    },
+    "jadwal": {
+      "kereta": "Argo Parahyangan",
+      "tanggalBerangkat": "2025-01-15",
+      "tanggalKedatangan": "2025-01-15"
+    },
+    "penumpang": [
+      {
+        "nama": "Jane Doe",
+        "nik": "9876543210987654"
+      },
+      {
+        "nama": "John Doe",
+        "nik": "1234567890123456"
+      }
+    ]
+  },
+  more data...
+]
+```
+
+### Lihat Rekap Pemasukan
+**Endpoint**: `/api/tiket/rekap`
+
+**Method**: `GET`
+
+**Request Header**:  
+- Bearer Token  
+- Role: petugas
+
+**Query Parameters**:  
+- `bulan` (required): Bulan dalam format angka (1–12).  
+- `tahun` (required): Tahun dalam format 4 digit (e.g., 2025).
+
+**Contoh Query**:  
+- `/api/tiket/rekap?bulan=01&tahun=2025`
+
+---
+
+**Response Body**:  
+```json
+{
+  "bulan": "January 2025",
+  "totalPemasukan": 5000000
+}
+```
+
+### History Transaksi Tiket
+
+**Endpoint**: `api/tiket/history`
+
+**Method**: ``GET``
+
+**Header**
+- **Authorization**: Bearer Token
+  - Role: pelanggan
+
+**Response Body**
+```json
+[
+  {
+    "id": 1,
+    "tanggal": "2025-01-15",
+    "jadwal": {
+      "kereta": "Argo Bromo",
+      "waktuBerangkat": "08:00",
+      "waktuTiba": "12:00",
+      "stasiunBerangkat": "Jakarta",
+      "stasiunTiba": "Surabaya",
+      "asalKeberangkatan": "Jakarta",
+      "tujuanKeberangkatan": "Surabaya",
+      "tanggalBerangkat": "2025-01-15",
+      "tanggalKedatangan": "2025-01-15"
+    },
+    "penumpang": [
+      {
+        "nama": "John Doe",
+        "nik": "1234567890123456"
+      },
+      {
+        "nama": "Jane Doe",
+        "nik": "6543210987654321"
+      }
+    ]
+  }
+]

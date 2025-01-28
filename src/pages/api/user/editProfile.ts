@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const prisma = new PrismaClient();
-import jwt from 'jsonwebtoken';
 
 const secretKey = process.env.JWT_SECRET || 'your_secret_key';
 
@@ -20,10 +20,10 @@ export default async function editProfileHandler(req: NextApiRequest, res: NextA
   const token = authorization.split(' ')[1];
 
   try {
-    console.log('Token:', token); // Log token for debugging
+    // console.log('Token:', token); // Log token for debugging
 
     const decoded: any = jwt.verify(token, secretKey);
-    console.log('Decoded:', decoded); // Log decoded token for debugging
+    // console.log('Decoded:', decoded); // Log decoded token for debugging
 
     if (!decoded) {
       return res.status(401).json({ message: 'Invalid token' });
