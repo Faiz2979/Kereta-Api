@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
 import { format } from 'date-fns';
+import jwt from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const prisma = new PrismaClient();
 const secretKey = process.env.JWT_SECRET || 'your_secret_key';
@@ -24,7 +24,6 @@ export default async function transaksiHandler(req: NextApiRequest, res: NextApi
     const user = await prisma.users.findUnique({
       where: { id: decoded.userId },
     });
-
     if (!user || user.role !== 'petugas') {
       return res.status(403).json({ message: 'Forbidden' });
     }
@@ -90,16 +89,16 @@ export default async function transaksiHandler(req: NextApiRequest, res: NextApi
       tanggal: format(new Date(transaksi.tanggal), 'yyyy-MM-dd'),
       pelanggan: {
         nama: transaksi.pelanggan.nama,
-        email: transaksi.pelanggan.user.email, // Access email from user relation
+        nik: transaksi.pelanggan.nik,
       },
       jadwal: {
-        kereta: transaksi.jadwal.kereta.nama,
+        kereta: transaksi.jadwal.kereta.namaKereta,
         tanggalBerangkat: format(new Date(transaksi.jadwal.tanggalBerangkat), 'yyyy-MM-dd'),
         tanggalKedatangan: format(new Date(transaksi.jadwal.tanggalKedatangan), 'yyyy-MM-dd'),
       },
       penumpang: transaksi.penumpang.map((penumpang) => ({
         nama: penumpang.nama,
-        umur: penumpang.umur,
+        nik: penumpang.nik,
       })),
     }));
 
