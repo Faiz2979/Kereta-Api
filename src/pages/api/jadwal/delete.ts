@@ -26,10 +26,13 @@ export default async function handler(req:NextApiRequest, res:NextApiResponse) {
     if (!user || user.role !== 'petugas') {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    await prisma.jadwal.delete({
+    const deleted = await prisma.jadwal.delete({
       where: { id: Array.isArray(id) ? parseInt(id[0], 10) : parseInt(id as string, 10) },
     });
-    res.status(204).end();
+    res.status(201).json({
+      message: 'Deleted successfully',
+      data: deleted,
+    });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }

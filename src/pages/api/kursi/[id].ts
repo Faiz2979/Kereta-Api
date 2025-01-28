@@ -9,15 +9,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === "GET") {
         try {
-            const gerbong = await prisma.gerbong.findUnique({
+            const kursi = await prisma.kursi.findUnique({
                 where: { id: Number(id) },
             });
 
-            if (!gerbong) {
+            if (!kursi) {
                 return res.status(404).json({ message: "Kursi not found" });
             }
 
-            return res.status(200).json({ gerbong });
+            return res.status(200).json({ kursi });
         } catch (error) {
             if (error instanceof Error) {
                 return res.status(500).json({ message: error.message });

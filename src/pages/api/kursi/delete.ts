@@ -40,7 +40,10 @@ export default async function handler(req: NextApiRequest, res:NextApiResponse) 
             },
         });
 
-        return res.status(201).json({ kursi });
+        return res.status(201).json({ 
+            message: "Data deleted successfully",
+            data: kursi
+        });
         } catch (error) {
         if (error instanceof Error) {
             return res.status(500).json({ message: error.message });

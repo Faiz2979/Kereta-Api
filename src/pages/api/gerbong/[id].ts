@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === "GET") {
         try {
-            const gerbong = await prisma.kursi.findUnique({
+            const gerbong = await prisma.gerbong.findUnique({
                 where: { id: Number(id) },
             });
 
