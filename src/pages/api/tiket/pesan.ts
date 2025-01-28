@@ -65,6 +65,7 @@ export default async function pesanTiketHandler(req: NextApiRequest, res: NextAp
         tanggal: new Date(),
         pelangganId: pelanggan.id,
         jadwalId: jadwal.id,
+        harga: jadwal.harga * totalPenumpang, // Include the total price
         penumpang: {
           create: penumpang.map((p: any) => ({
             nama: p.nama,
