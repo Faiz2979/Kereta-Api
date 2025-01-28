@@ -2,26 +2,40 @@
   "name": "kereta-api",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "ts-node prisma/seed.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
+    "@types/bcrypt": "^5.0.2",
+    "@types/next": "^8.0.7",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.1.6",
+    "pdfkit": "^0.16.0",
     "prisma": "^6.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^20",
+    "@types/pdfkit": "^0.13.8",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

@@ -1,31 +1,30 @@
-import { PrismaClient } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("req.method", req.method);
-    const { id } = req.query;
+  const { id } = req.query;
 
-    if (req.method === "GET") {
-        try {
-            const jadwal = await prisma.jadwal.findUnique({
-                where: { id: Number(id) },
-            });
+  if (req.method !== 'GET') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
 
-            if (!jadwal) {
-                return res.status(404).json({ message: "Tidak Ada Jadwal" });
-            }
+  try {
+    const jadwal = await prisma.jadwal.findUnique({
+      where: { id: Number(id) },
+      include: {
+        kereta: true,
+      },
+    });
 
-            return res.status(200).json({ jadwal });
-        } catch (error) {
-            if (error instanceof Error) {
-                return res.status(500).json({ message: error.message });
-            }
-            return res.status(500).json({ message: "An unknown error occurred" });
-        }
-    } else {
-        res.setHeader('Allow', ['GET']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+    if (!jadwal) {
+      return res.status(404).json({ message: 'Jadwal not found' });
     }
+
+    return res.status(200).json(jadwal);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 }
