@@ -19,10 +19,6 @@ model Users {
   password  String
   email     String     @unique
   role      String
-  nama      String?
-  alamat    String?
-  telp      String?
-  nik       String?
   pelanggan Pelanggan?
   petugas   Petugas?
 }
