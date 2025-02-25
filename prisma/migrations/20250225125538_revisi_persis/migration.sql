@@ -14,8 +14,8 @@ CREATE TABLE `Pelanggan` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nik` VARCHAR(191) NOT NULL,
     `nama` VARCHAR(191) NOT NULL,
-    `alamat` VARCHAR(191) NOT NULL,
-    `telp` VARCHAR(191) NOT NULL,
+    `alamat` VARCHAR(191) NULL,
+    `telp` VARCHAR(191) NULL,
     `userId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Pelanggan_nik_key`(`nik`),
@@ -58,7 +58,7 @@ CREATE TABLE `Gerbong` (
 -- CreateTable
 CREATE TABLE `Kursi` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `noKursi` VARCHAR(191) NOT NULL,
+    `nomorKursi` VARCHAR(191) NOT NULL,
     `gerbongId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -67,12 +67,17 @@ CREATE TABLE `Kursi` (
 -- CreateTable
 CREATE TABLE `Jadwal` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `keretaId` INTEGER NOT NULL,
+    `waktuBerangkat` VARCHAR(191) NOT NULL,
+    `waktuTiba` VARCHAR(191) NOT NULL,
+    `stasiunBerangkat` VARCHAR(191) NOT NULL,
+    `stasiunTiba` VARCHAR(191) NOT NULL,
     `asalKeberangkatan` VARCHAR(191) NOT NULL,
     `tujuanKeberangkatan` VARCHAR(191) NOT NULL,
     `tanggalBerangkat` DATETIME(3) NOT NULL,
     `tanggalKedatangan` DATETIME(3) NOT NULL,
     `harga` DOUBLE NOT NULL,
-    `keretaId` INTEGER NOT NULL,
+    `kuota` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -83,6 +88,17 @@ CREATE TABLE `PembelianTiket` (
     `tanggal` DATETIME(3) NOT NULL,
     `pelangganId` INTEGER NOT NULL,
     `jadwalId` INTEGER NOT NULL,
+    `harga` DOUBLE NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Penumpang` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nama` VARCHAR(191) NOT NULL,
+    `nik` VARCHAR(191) NOT NULL,
+    `pembelianTiketId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -90,8 +106,6 @@ CREATE TABLE `PembelianTiket` (
 -- CreateTable
 CREATE TABLE `DetailPembelian` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `nik` VARCHAR(191) NOT NULL,
-    `namaPenumpang` VARCHAR(191) NOT NULL,
     `pembelianTiketId` INTEGER NOT NULL,
     `kursiId` INTEGER NOT NULL,
 
@@ -111,13 +125,16 @@ ALTER TABLE `Gerbong` ADD CONSTRAINT `Gerbong_keretaId_fkey` FOREIGN KEY (`keret
 ALTER TABLE `Kursi` ADD CONSTRAINT `Kursi_gerbongId_fkey` FOREIGN KEY (`gerbongId`) REFERENCES `Gerbong`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Jadwal` ADD CONSTRAINT `Jadwal_keretaId_fkey` FOREIGN KEY (`keretaId`) REFERENCES `Kereta`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Jadwal` ADD CONSTRAINT `Jadwal_keretaId_fkey` FOREIGN KEY (`keretaId`) REFERENCES `Kereta`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `PembelianTiket` ADD CONSTRAINT `PembelianTiket_pelangganId_fkey` FOREIGN KEY (`pelangganId`) REFERENCES `Pelanggan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `PembelianTiket` ADD CONSTRAINT `PembelianTiket_pelangganId_fkey` FOREIGN KEY (`pelangganId`) REFERENCES `Pelanggan`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `PembelianTiket` ADD CONSTRAINT `PembelianTiket_jadwalId_fkey` FOREIGN KEY (`jadwalId`) REFERENCES `Jadwal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `PembelianTiket` ADD CONSTRAINT `PembelianTiket_jadwalId_fkey` FOREIGN KEY (`jadwalId`) REFERENCES `Jadwal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Penumpang` ADD CONSTRAINT `Penumpang_pembelianTiketId_fkey` FOREIGN KEY (`pembelianTiketId`) REFERENCES `PembelianTiket`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `DetailPembelian` ADD CONSTRAINT `DetailPembelian_pembelianTiketId_fkey` FOREIGN KEY (`pembelianTiketId`) REFERENCES `PembelianTiket`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
