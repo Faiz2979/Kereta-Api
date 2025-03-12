@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const prisma = new PrismaClient();
 
@@ -12,11 +12,11 @@ export default async function loginHandler(req: NextApiRequest, res: NextApiResp
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
     const user = await prisma.users.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (!user) {
@@ -28,11 +28,27 @@ export default async function loginHandler(req: NextApiRequest, res: NextApiResp
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, secretKey, {
+    const token = jwt.sign({ userId: user.id, role: user.role }, secretKey, {
       expiresIn: '1h',
     });
 
-    const welcomeMessage = `Selamat datang, ${user.nama || user.username}! Anda masuk sebagai ${user.role}.`;
+    let welcomeMessage = `Selamat datang, ${user.username}! Anda masuk sebagai ${user.role}.`;
+
+    if (user.role === 'pelanggan') {
+      const pelanggan = await prisma.pelanggan.findUnique({
+      where: { id: user.id },
+      });
+      if (pelanggan) {
+      welcomeMessage = `Selamat datang, ${pelanggan.nama}! Anda masuk sebagai ${user.role}.`;
+      }
+    } else if (user.role === 'petugas') {
+      const petugas = await prisma.petugas.findUnique({
+      where: { id: user.id },
+      });
+      if (petugas) {
+      welcomeMessage = `Selamat datang, ${petugas.nama}! Anda masuk sebagai ${user.role}.`;
+      }
+    }
 
     return res.status(200).json({ token, message: welcomeMessage });
   } catch (error) {

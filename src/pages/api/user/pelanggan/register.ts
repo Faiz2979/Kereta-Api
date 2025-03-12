@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { username, password, nik, nama, alamat, telp } = req.body;
+    const { username, password,email, nik, nama, alamat, telp } = req.body;
 
     // Validasi input
     if (!username || !password || !nik || !nama) {
@@ -19,6 +19,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Validasi apakah sudah ada user dengan username atau email yang sama
+    const existingUser = await prisma.users.findFirst({
+      where: {
+        OR: [
+          { username },
+        ],
+      },
+    });
+
+    const existingPelanggan = await prisma.pelanggan.findFirst({
+      where: {
+        OR: [
+          { nik },
+        ],
+      },
+    });
+
+    if (existingUser || existingPelanggan) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
     // Buat User terlebih dahulu
     const user = await prisma.users.create({
@@ -51,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error:aaa", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 }

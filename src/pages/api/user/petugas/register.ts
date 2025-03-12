@@ -20,6 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Validasi apakah sudah ada user dengan username atau email yang sama
+        const existingUser = await prisma.users.findFirst({
+          where: {
+            OR: [
+              { username },
+            ],
+          },
+        });
+
+    
+        if (existingUser) {
+          return res.status(400).json({ message: "Username already exists" });
+        }
+
     // Buat User
     const user = await prisma.users.create({
       data: {
